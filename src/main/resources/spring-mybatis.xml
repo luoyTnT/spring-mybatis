@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- 开启注解 -->
+    <context:annotation-config/>
+
+    <!-- 包扫描器 -->
+    <context:component-scan base-package="com.thw.test"/>
+
+    <!-- 引入数据库配置文件 -->
+    <bean id="propertyPlaceholderConfigurer"
+          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location" value="classpath:mysql.properties"/>
+    </bean>
+
+    <!-- 配置数据源 -->
+    <bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource">
+        <property name="url" value="${url}"/>
+        <property name="driverClassName" value="${driver}"/>
+        <property name="username" value="${username}"/>
+        <property name="password" value="${password}"/>
+    </bean>
+
+    <!-- 配置sqlsessionfactory -->
+    <bean id="factory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <!-- 引入sql映射文件 -->
+        <property name="mapperLocations" value="classpath*:mapper/*Mapper.xml"/>
+        <!-- 配置别名 -->
+        <property name="typeAliasesPackage" value="com.thw.test.entity"/>
+    </bean>
+
+    <!-- 配置扫描器 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!-- 扫描这个包以及它的子包下的所有映射接口类 -->
+        <property name="basePackage" value="com.thw.test.mapper" />
+        <property name="sqlSessionFactoryBeanName" value="factory" />
+    </bean>
+
+    <!-- 配置事务 -->
+    <bean id="tx"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+</beans>
